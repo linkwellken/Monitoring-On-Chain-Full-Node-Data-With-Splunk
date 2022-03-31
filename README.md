@@ -5,7 +5,7 @@ This guide covers directly monitoring on-chain block data, transactional data, n
 
 ## Initial deployment
 Please review the pre-existing Ethlogger docs on Github for more information on the connector. Ethlogger can be deployed using Docker with Docker run commands or docker-compose. This guide will leverage the latter. Requirements include:
-* A linux server with Splunk already installed and configured utilizing the previous Splunk setup guide.
+* A linux server with Splunk already installed and configured utilizing the previous [Splunk setup guide](https://github.com/maverick705/Splunk-Setup-For-Chainlink).
 * Docker and Docker-Compose installed
 * Root level privileges
 
