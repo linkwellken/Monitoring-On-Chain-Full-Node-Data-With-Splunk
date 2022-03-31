@@ -15,14 +15,6 @@ Please review the pre-existing Ethlogger docs on Github for more information on 
 #### Example Polygon Address Explorer
 ![Polygon_Address_Explorer](Polygon_Address_Explorer.png)
 
-## Ethlogger deployment and setup
-For simplicity, we will use the same server that Splunk is deployed on for deploying the Ethlogger connector.
-```
-cd ~
-git clone "https://github.com/splunk/splunk-connect-for-ethereum.git"
-cd splunk-connect-for-ethereum
-```
-
 ## Create Splunk indexes
 You will need to create three different indexes in Splunk. Two event indexes and one metric index for your full node metrics.
 
@@ -73,8 +65,16 @@ Complete the below step four times, and give each HEC token a different name in 
 7. Select "Submit"
 8. Copy the HEC token for use in the next step
 ```
+## Ethlogger deployment and setup
+For simplicity, we will use the same server that Splunk is deployed on for deploying the Ethlogger connector.
+```
+cd ~
+git clone "https://github.com/splunk/splunk-connect-for-ethereum.git"
+cd splunk-connect-for-ethereum
+```
 
-## Create the docker-compose.yaml file
+
+### Create the docker-compose.yaml file
 This will be the main config file used for deploying Ethlogger with docker-compose.
 ```
 cd cd ~/splunk-connect-for-ethereum/
@@ -82,7 +82,7 @@ touch docker-compose.yaml
 vi docker-compose.yaml
 ```
 
-## Update the docker-compose.yaml file
+### Update the docker-compose.yaml file
 * There are many different configuration settings here which can be viewed in the Ethlogger docs, but see below for an example of how I built the yaml file.
 * The following docker-compose file is pointed towards two full Rinkeby GETH nodes but feel free to scale back if only monitoring one node.  Block data is only being collected from one of the full nodes as the block data is a considerable amount of ingest, and block data from both nodes leads to duplicate data in Splunk.
 * 
@@ -167,7 +167,7 @@ services:
         splunk-source: "ethlogger-secondary"
         splunk-index: "ethlogger"
 ```
-## Deploy the docker-compose yaml file
+### Deploy the docker-compose yaml file
 Once the yaml file is finished, simply run the below command and if all goes well, your node metrics and log data should be sent to Splunk.
 ```
 docker-compose up -d
