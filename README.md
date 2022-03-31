@@ -119,7 +119,8 @@ services:
       - ABI_DIR=/app/abis
       - COLLECT_NODE_METRICS=true
       - COLLECT_NODE_INFO=true
-#     - NETWORK_NAME=rinkeby
+      - NETWORK_NAME=testnet
+      - CHAIN_NAME=rinkeby
     volumes:
       - ./abis:/app/abis
       - ./:/app
@@ -151,7 +152,8 @@ services:
       - COLLECT_BLOCKS=false
       - COLLECT_NODE_METRICS=true
       - COLLECT_NODE_INFO=true
-#     - NETWORK_NAME=rinkeby
+      - NETWORK_NAME=testnet
+      - CHAIN_NAME=rinkeby
     volumes:
       - ./abis1:/app/abis
       - ./:/app
@@ -164,5 +166,45 @@ services:
         splunk-sourcetype: "docker:ethlogger"
         splunk-source: "ethlogger-secondary"
         splunk-index: "ethlogger"
-
 ```
+## Deploy the docker-compose yaml file
+Once the yaml file is finished, simply run the below command and if all goes well, your node metrics and log data should be sent to Splunk.
+```
+docker-compose up -d
+```
+
+### Verify that there are no errors in the docker logs
+At this point you should have successfully deployed two docker containers, one for each full node.
+Run the commands below to verify:
+```
+docker logs ethlogger
+docker logs ethlogger-secondary
+```
+
+## Confirm data delivery to Splunk
+This is done by running searches on the indexes created above in the Splunk GUI within the search and reporting app.
+Run the below searches to confirm data flow:
+```
+index=ethereum
+index=ethlogger
+```
+If you see data, you are most of the way there but still need to do a few steps.
+
+## Install the Ethereum Basics app 
+This can be found from the Ethlogger repo [here](https://github.com/splunk/ethereum-basics/releases/tag/1.0.13)
+* Download the ethereum-basics_1.0.13.tgz file.
+* In the Splunk GUI, navigate to "Apps" in the top left, then click on "Manage Apps"
+* Click on "Install app from file" in the top right.
+* Select the ethereum-basics app downloaded previously.
+* Navigate back to "Apps" to confirm that Ethereum Basics is visible. If not, restart Splunk.
+
+## Update the macro in the search GUI
+The macro points to your ethereum index and is required for the dashboards to work.
+* Navigate to settings in the top right of the GUI, click on "advanced search" and then "search macros".
+* Change the filter settings to the ethereum basics app and filter on the ethereum index macro.
+* Ensure the macro is pointed towards "index=ethereum" and if it isn't, update it.
+
+## Verify app functionality
+Navigate to "Apps" and click on Ethereum Basics. If everything was deployed correctly, you should now see data being populated in your app similar to below.
+![Ethereum_Basics_Setup.png](Ethereum_Basics_Setup.png)
+
