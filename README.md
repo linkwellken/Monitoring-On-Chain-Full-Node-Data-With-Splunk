@@ -207,4 +207,9 @@ The macro points to your ethereum index and is required for the dashboards to wo
 ## Verify app functionality
 Navigate to "Apps" and click on Ethereum Basics. If everything was deployed correctly, you should now see data being populated in your app similar to below.
 ![Ethereum_Basics_Setup.png](Ethereum_Basics_Setup.png)
+Browse through the different tabs at the top of the app for access to the address explorer and gas analytics dashboards.
 
+### Confirm node health
+In the Ethereum Basics app, browse to the "node monitoring tab".
+Data should automatically populate and look similar to the below image:
+![Node_Metrics](Node_Metrics.png)
