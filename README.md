@@ -227,8 +227,8 @@ If you are only pulling in full node data from one network i.e. Rinkeby, then no
 
 In the cloned dashboard, click edit in the top right, then click source in the top left.
 For any line that starts with <query> change from:
-  `ethereum_index` sourcetype="ethereum:block"
+  \`ethereum_index\` sourcetype="ethereum:block"
 to
-  `ethereum_index` network::rinkeby sourcetype="ethereum:block"
+  \`ethereum_index\` network::rinkeby sourcetype="ethereum:block"
 
 
