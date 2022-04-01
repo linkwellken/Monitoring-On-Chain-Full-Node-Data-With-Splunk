@@ -20,7 +20,7 @@ You will need to create three different indexes in Splunk. Two event indexes and
 
 ### Create event indexes
 Modify the config file at /opt/splunk/etc/system/local/indexes.conf and add the two event indexes.
-By default these indexes store 500GB of ingested data and have no time based retention settings. View Splunk docs on [indexes.conf](https://docs.splunk.com/Documentation/Splunk/latest/admin/Indexesconf) for more information.
+By default these indexes store 500GB of ingested data and have no time based retention settings. Therefore once an index fills up, data will start to be deleted off the back end be default. View Splunk docs on [indexes.conf](https://docs.splunk.com/Documentation/Splunk/latest/admin/Indexesconf) for more information on data retention settings.
 ```
 vi /opt/splunk/etc/system/local/indexes.conf
 
@@ -46,7 +46,8 @@ homePath = /indexes/ethereum_metrics/db
 thawedPath = /indexes/ethereum_metrics/thaweddb
 datatype=metric
 ```
-### Restart Splunk for changes to take effect
+### Restart Splunk for changes to take effect. 
+In general it is good practice to restart Splunk after any OS level config change.
 ```
 cd /opt/splunk/bin
 ./splunk restart
@@ -54,7 +55,7 @@ cd /opt/splunk/bin
 
 ## Create HEC tokens
 You will need to create four new HEC tokens which are used to send the Docker and Ethlogger data over http to your Splunk instance.
-Complete the below step four times, and give each HEC token a different name in line with the Splunk indexes created above.
+Complete the below step four times, and give each HEC token a different name i.e. "ethlogger docker", "ethereum events", "ethereum metrics", and "ethereum internal metrics".
 ```
 1. Navigate to Settings
 2. Navigate to Data Inputs
@@ -84,8 +85,9 @@ vi docker-compose.yaml
 
 ### Update the docker-compose.yaml file
 * There are many different configuration settings here which can be viewed in the Ethlogger docs, but see below for an example of how I built the yaml file.
-* The following docker-compose file is pointed towards two full Rinkeby GETH nodes but feel free to scale back if only monitoring one node.  Block data is only being collected from one of the full nodes as the block data is a considerable amount of ingest, and block data from both nodes leads to duplicate data in Splunk.
-* 
+* The following docker-compose file is pointed towards two full Rinkeby GETH nodes but feel free to scale back if only monitoring one node.  Block data is only being collected from the first full node as the block data is a considerable amount of ingest, and ingesting block data from both nodes leads to duplicate data in Splunk.
+* Pay careful attention and ensure you update all 8 HEC token locations as well as all four IPs for your Splunk instance and full node(s).
+* x-logging, x-log-opts, and logging at the bottom are optional for collecting the docker log data from the ethlogger containers.
 ```
 version: "3.6"
 x-logging:
@@ -93,7 +95,7 @@ x-logging:
   driver: "splunk"
 x-log-opts:
   &log-opts
-  splunk-token: <HEC token for ethlogger index>
+  splunk-token: <HEC token for "ethlogger docker" index>
   splunk-url: https://<splunk IP>:8088
   splunk-insecureskipverify: "true"
   splunk-verify-connection: "false"
@@ -168,7 +170,7 @@ services:
         splunk-index: "ethlogger"
 ```
 ### Deploy the docker-compose yaml file
-Once the yaml file is finished, simply run the below command and if all goes well, your node metrics and log data should be sent to Splunk.
+Once the yaml file is finished, simply run the below command and if all goes well, your node metrics and log data should be sending to Splunk.
 ```
 docker-compose up -d
 ```
@@ -180,6 +182,7 @@ Run the commands below to verify:
 docker logs ethlogger
 docker logs ethlogger-secondary
 ```
+Based on the docker logs it should be fairly clear whether the ethlogger containers are successfully pulling in data or not.
 
 ## Confirm data delivery to Splunk
 This is done by running searches on the indexes created above in the Splunk GUI within the search and reporting app.
@@ -189,6 +192,10 @@ index=ethereum
 index=ethlogger
 ```
 If you see data, you are most of the way there but still need to do a few steps.
+If you don't, run the below search to verify if data is coming in but with the wrong index or sourcetype.
+```
+| tstats values(sourcetype) where index=* by index
+```
 
 ## Install the Ethereum Basics app 
 This can be found from the Ethlogger repo [here](https://github.com/splunk/ethereum-basics/releases/tag/1.0.13)
@@ -199,7 +206,7 @@ This can be found from the Ethlogger repo [here](https://github.com/splunk/ether
 * Navigate back to "Apps" to confirm that Ethereum Basics is visible. If not, restart Splunk.
 
 ## Update the macro in the search GUI
-The macro points to your ethereum index and is required for the dashboards to work.
+The macro we need to potentially modify points to your ethereum index and is required for the dashboards to work.
 * Navigate to settings in the top right of the GUI, click on "advanced search" and then "search macros".
 * Change the filter settings to the ethereum basics app and filter on the ethereum index macro.
 * Ensure the macro is pointed towards "index=ethereum" and if it isn't, update it.
@@ -213,3 +220,15 @@ Browse through the different tabs at the top of the app for access to the addres
 In the Ethereum Basics app, browse to the "node monitoring tab".
 Data should automatically populate and look similar to the below image:
 ![Node_Metrics](Node_Metrics.png)
+
+## Modifying dashboards
+If you are only pulling in full node data from one network i.e. Rinkeby, then no changes need to be made to the dashboards. However, if you are pulling in data from multiple networks such as Polygon as well, and both the Rinkeby and Polygon logs are going to the same index with the same sourcetypes, you will need to modify the searches in the dashboards to point to the respective networks.
+* Before modifying the default dashboards, first create clones of the dashboards by clicking on the "..." in the top right and clicking clone.
+
+In the cloned dashboard, click edit in the top right, then click source in the top left.
+For any line that starts with <query> change from:
+  `ethereum_index` sourcetype="ethereum:block"
+to
+  `ethereum_index` network::rinkeby sourcetype="ethereum:block"
+
+
