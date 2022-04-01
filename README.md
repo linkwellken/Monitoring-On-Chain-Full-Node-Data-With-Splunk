@@ -1,4 +1,4 @@
-# Monitoring-On-Chain-Full-Node-Data-With-Splunk
+# Monitoring Your On Chain Full Node Data With Splunk
 This guide covers directly monitoring on-chain block data, transactional data, node information and metrics from your full nodes in Splunk, as well as how to visualize that data leveraging prebuilt Ethereum dashboards.  This guide builds off of the previous repo [here](https://github.com/maverick705/Splunk-Setup-For-Chainlink) which covers Splunk basic configuration and setup, and also leverages the [Ethlogger](https://github.com/splunk/splunk-connect-for-ethereum) custom connector built by Splunk for this purpose.
 
 **Disclaimer**: This is not an official guide by Splunk, but a passionate Chainlink community member.  Splunk is a complex and sophisticated monitoring solution, and it is recommended to have at least some pre-existing knowledge before attempting to deploy this in your own environment.  This guide however will provide the necessary information to get the Ethlogger connector up and running.
