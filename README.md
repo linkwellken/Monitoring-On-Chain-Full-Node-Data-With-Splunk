@@ -230,5 +230,11 @@ For any line that starts with <query> change from:
   \`ethereum_index\` sourcetype="ethereum:block"
 to
   \`ethereum_index\` network::rinkeby sourcetype="ethereum:block"
+  
+### Alternate dashboard option
+* Clone each of the ethereum address explorer and gas analytics dashboards twice, adding the respective names for Rinkeby and Polygon to the front of the dashboards.
+* In the code for this repo includes four dashboards - 1 address explorer each for Rinkeby and Polygon as well as 1 modified gas analytics/address explorer for Rinkeby and Polygon as well.  Feel free to replace the source xml in your cloned dashboards with the xml files in this repo.
+  
+Last but not least, enjoy your full node analytics with Splunk!
 
 
